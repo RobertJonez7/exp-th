@@ -6,12 +6,12 @@ import { DocumentsStore } from './documents.store';
 export class DocumentsService implements OnModuleInit {
   private documentsCache: Document[] = [];
 
-  constructor(private readonly store: DocumentsStore) {}
+  constructor(private readonly store: DocumentsStore) { }
 
   // The list endpoint is hit on every page load and the document set is small,
   // so we keep a ready-to-serve copy in memory instead of rebuilding it per request.
   onModuleInit(): void {
-    this.documentsCache = this.store.all();
+    this.refreshCache();
   }
 
   async findAll(): Promise<Document[]> {
@@ -19,7 +19,11 @@ export class DocumentsService implements OnModuleInit {
   }
 
   async create(title: string): Promise<Document> {
-    return this.store.insert(title);
+    const document = this.store.insert(title);
+    this.refreshCache()
+
+    return document
+
   }
 
   async delete(id: string): Promise<void> {
@@ -30,9 +34,27 @@ export class DocumentsService implements OnModuleInit {
     }
 
     if (document.lockedBy !== null) {
-      throw new ConflictException(`Document ${id} is locked by ${document.lockedBy}`);
+      throw new ConflictException(`Document: ${document.title} is locked by ${document.lockedBy}`);
     }
 
     this.store.remove(id);
+    this.refreshCache()
+  }
+
+  async update(id: string, doc: Document): Promise<Document> {
+    const document = this.store.findById(id);
+
+    if (!document) {
+      throw new NotFoundException(`Document ${doc.title} not found`);
+    }
+
+    const updated = this.store.update(doc)!;
+    this.refreshCache();
+
+    return updated;
+  }
+
+  private refreshCache() {
+    this.documentsCache = this.store.all();
   }
 }

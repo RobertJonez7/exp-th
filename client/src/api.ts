@@ -1,3 +1,5 @@
+import { Doc } from "./types";
+
 async function request(path: string, init?: RequestInit): Promise<any> {
   const response = await fetch(path, {
     headers: { 'Content-Type': 'application/json' },
@@ -26,5 +28,12 @@ export function bulkDeleteDocuments(ids: string[]) {
   return request('/documents/bulk-delete', {
     method: 'POST',
     body: JSON.stringify({ ids }),
+  });
+}
+
+export function updateDocument(id: string, changes: Doc): Promise<Doc> {
+  return request(`/documents/${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    body: JSON.stringify(changes),
   });
 }

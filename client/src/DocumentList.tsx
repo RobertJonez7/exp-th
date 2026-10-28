@@ -1,13 +1,15 @@
+import { Popover } from './components/popover';
 import type { Doc } from './types';
 
 interface DocumentListProps {
   documents: Doc[];
   selectedIds: string[];
   onSelectionChange: (ids: string[]) => void;
+  onToggleLock: (doc: Doc) => Promise<void>;
 }
 
 function isLocked(doc: Doc) {
-  return doc.locked;
+  return !!doc.lockedBy;
 }
 
 function formatDate(value: string) {
@@ -18,7 +20,7 @@ function formatDate(value: string) {
   });
 }
 
-export default function DocumentList({ documents, selectedIds, onSelectionChange }: DocumentListProps) {
+export default function DocumentList({ documents, selectedIds, onSelectionChange, onToggleLock }: DocumentListProps) {
   const allSelected = documents.length > 0 && selectedIds.length === documents.length;
 
   const toggleAll = () => {
@@ -41,6 +43,7 @@ export default function DocumentList({ documents, selectedIds, onSelectionChange
           <th>Title</th>
           <th>Last updated</th>
           <th>Status</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -57,6 +60,11 @@ export default function DocumentList({ documents, selectedIds, onSelectionChange
             <td>{doc.title}</td>
             <td className="muted">{formatDate(doc.updatedAt)}</td>
             <td>{isLocked(doc) ? <span className="lock">Locked</span> : <span className="muted">—</span>}</td>
+            <td>
+              <Popover doc={doc} onToggleLock={onToggleLock}>
+                <span className="ellipsis">...</span>
+              </Popover>
+            </td>
           </tr>
         ))}
       </tbody>

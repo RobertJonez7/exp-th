@@ -27,12 +27,23 @@ export class DocumentsStore {
       lockedBy: null,
     };
 
-    this.documents.push(document);
+    this.documents.unshift(document);
     return { ...document };
   }
 
   remove(id: string): void {
     const index = this.documents.findIndex((doc) => doc.id === id);
     this.documents.splice(index, 1);
+  }
+
+  update(doc: Document): Document | undefined {
+    const document = this.documents.find((d) => d.id === doc.id);
+
+    if (!document) {
+      return undefined;
+    }
+
+    Object.assign(document, doc);
+    return { ...document };
   }
 }

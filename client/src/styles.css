@@ -79,7 +79,6 @@ table.documents {
   background: #fff;
   border: 1px solid #e2e5e9;
   border-radius: 8px;
-  overflow: hidden;
 }
 
 .documents th,
@@ -114,4 +113,11 @@ table.documents {
   background: #fdf1e3;
   color: #8a5a12;
   font-size: 12px;
+}
+
+.ellipsis {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
 }
